@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <locale.h>
+
 
 typedef struct tab{
 	char tipo;
@@ -27,6 +29,7 @@ void jogada(tab tabuleiro[8][8]);
 
 int main()
 {
+
 	tab tabuleiro[8][8];
 	initTabuleiro(tabuleiro);
 	imprimirTabuleiro(tabuleiro);
@@ -68,7 +71,7 @@ void initTabuleiro(tab tabuleiro[8][8])
 
 bool vazio(tab tabuleiro[8][8], pos p)
 {
-	if(tabuleiro[p.ini[0]][p.ini[1]].tipo == '-')
+	if(tabuleiro[p.fin[0]][p.fin[1]].tipo == '-')
 		return true;
 	else
 		return false;
@@ -84,19 +87,21 @@ bool inimigo(tab tabuleiro[8][8], pos p)
 
 void move(tab tabuleiro[8][8], pos p)
 {
-	tabuleiro[p.fin[0]][p.fin[0]] = tabuleiro[p.ini[0]][p.ini[0]]; // Coloca a peça da posição inicial na posição final
-	tabuleiro[p.ini[0]][p.ini[0]] = (tab) {'-','N'}; // Coloca um espaço vazio na posição inicial
+	tabuleiro[p.fin[0]][p.fin[1]] = tabuleiro[p.ini[0]][p.ini[1]]; // Coloca a peça da posição inicial na posição final
+	tabuleiro[p.ini[0]][p.ini[1]] = (tab) {'-','N'}; // Coloca um espaço vazio na posição inicial
 
 }
 
 void peao(tab tabuleiro[8][8], pos p)
 {
+	printf("\n\nentrou certo\n\n");
 	if(vazio(tabuleiro, p) && p.fin[0]==p.ini[0]+1) // Caso o movimento seja para frente e a casa esteja vazia
 		move(tabuleiro, p);
 	else if(inimigo(tabuleiro, p) && p.fin[0]==p.ini[0]+1 && (p.fin[1]==p.ini[1]+1 || p.fin[1]==p.ini[1]-1)) // Caso o movimento seja lateral e haja um inimigo na casa
 		move(tabuleiro, p);
 	else
 		printf("Movimento invalido");
+
 }
 
 void cavalo(tab tabuleiro[8][8], pos p)
@@ -118,8 +123,7 @@ void torre(tab tabuleiro[8][8], pos p)
 	}
 	for(int i=1; i<9; i++)
 	{
-		if((p.fin[0]==p.in[0]]+i && (p.fin[0]<7&&p.fin[0]>=0)) || (p.fin[0]==p.ini[0]-i && (p.fin[0]<7&&p.fin[0]>=0)) || 
-			(p.fin[1]==p.in[1]]+i && (p.fin[1]<7&&p.fin[1]>=0)) || (p.fin[1]==p.ini[1]-i && (p.fin[1]<7&&p.fin[1]>=0)))//Permite movimentar enquanto na mesma linha ou coluna, restrito de 0 a 7
+		if((p.fin[0]==p.ini[0]+i && (p.fin[0]<7&&p.fin[0]>=0)) || (p.fin[0]==p.ini[0]-i && (p.fin[0]<7&&p.fin[0]>=0)) || (p.fin[1]==p.ini[1]+i && (p.fin[1]<7&&p.fin[1]>=0)) || (p.fin[1]==p.ini[1]-i && (p.fin[1]<7&&p.fin[1]>=0)))//Permite movimentar enquanto na mesma linha ou coluna, restrito de 0 a 7
 		{
 			move(tabuleiro, p);
 			return;
@@ -133,23 +137,23 @@ void rainha(tab tabuleiro[8][8], pos p)
 	if((vazio(tabuleiro, p) || inimigo(tabuleiro, p)))
 	{
 		move(tabuleiro, p);
-		break;
+		return;
 	}
 	else if(p.fin[0]==p.ini[0]+1 || p.fin[0]==p.ini[0]-1 || p.fin[1]==p.ini[1]+1 || p.fin[1]==p.ini[1]-1 || (p.fin[0]==p.ini[0]+1 && 
-		(p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1))(p.fin[0]==p.ini[0]-1 && (p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1)))//Movimenta uma casa a frente em todas as direções possíveis.
+		(p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1)) || (p.fin[0]==p.ini[0]-1 && (p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1)))//Movimenta uma casa a frente em todas as direções possíveis.
 	for(int i=0; i<8; i++)
 	{
-		if((p.fin[0]==p.in[0]]+i && (p.fin[0]<7&&p.fin[0]>=0)) || (p.fin[0]==p.ini[0]-i && (p.fin[0]<7&&p.fin[0]>=0)) || 
-			(p.fin[1]==p.in[1]]+i && (p.fin[1]<7&&p.fin[1]>=0)) || (p.fin[1]==p.ini[1]-i && (p.fin[1]<7&&p.fin[1]>=0)))
+		if((p.fin[0]==p.ini[0]+i && (p.fin[0]<7&&p.fin[0]>=0)) || (p.fin[0]==p.ini[0]-i && (p.fin[0]<7&&p.fin[0]>=0)) || 
+			(p.fin[1]==p.ini[1]+i && (p.fin[1]<7&&p.fin[1]>=0)) || (p.fin[1]==p.ini[1]-i && (p.fin[1]<7&&p.fin[1]>=0)))
 			{
-			move(tabuleiro, p);
-			break;
+				move(tabuleiro, p);
+				return;
 			}
-		else if((p.fin[0]==p.ini[0]]+i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i)) || 
-			(p.fin[0]==p.ini[0]]-i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i))) //Permite movimentar lateralmente até o fim do tabuleiro
+		else if((p.fin[0]==p.ini[0]+i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i)) || 
+			(p.fin[0]==p.ini[0]-i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i))) //Permite movimentar lateralmente até o fim do tabuleiro
 			{
-			move(tabuleiro, p);
-			break;
+				move(tabuleiro, p);
+				return;
 			}
 	}
 	printf("\nMovimento invalido");
@@ -157,7 +161,7 @@ void rainha(tab tabuleiro[8][8], pos p)
 void rei(tab tabuleiro[8][8], pos p)
 {
 	if(p.fin[0]==p.ini[0]+1 || p.fin[0]==p.ini[0]-1 || p.fin[1]==p.ini[1]+1 || p.fin[1]==p.ini[1]-1 || (p.fin[0]==p.ini[0]+1 && 
-		(p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1))(p.fin[0]==p.ini[0]-1 && (p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1)))//Movimenta uma casa a frente em todas as direções possíveis.
+		(p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1)) || (p.fin[0]==p.ini[0]-1 && (p.fin[1]==p.ini[1]-1||p.fin[1]==p.ini[1]+1)))//Movimenta uma casa a frente em todas as direções possíveis.
 		move(tabuleiro, p);
 	else
 		printf("Movimento invalido");
@@ -166,11 +170,11 @@ void bispo(tab tabuleiro[8][8], pos p)
 {
 	for(int i=1; i<9; i++)
 	{
-		if((p.fin[0]==p.ini[0]]+i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i)) || 
-			(p.fin[0]==p.ini[0]]-i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i))) //Permite movimentar lateralmente até o fim do tabuleiro
+		if((p.fin[0]==p.ini[0]+i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i)) || 
+			(p.fin[0]==p.ini[0]-i && (p.fin[0]<7&&p.fin[0]>=0) && (p.fin[1]==p.ini[1]+i || p.fin[1]==p.ini[1]+i))) //Permite movimentar lateralmente até o fim do tabuleiro
 		{
 			move(tabuleiro, p);
-			break;
+			return;
 		}	
 	}	
 		printf("Movimento invalido");
@@ -192,35 +196,48 @@ void imprimirTabuleiro(tab tabuleiro[8][8])
 void jogada(tab tabuleiro[8][8])
 {
 	pos p;
-	printf("\nDigite a posição atual da peça: ");
-	scanf("%d %d", &p.ini[0], &p.ini[1]);
-	printf("\nDigite a posição de destino: ");
-	scanf("%d %d", &p.fin[0], &p.fin[1]);
-	switch(tabuleiro[p.ini[0]][p.ini[1]])
-	{
-		case 'P':
-			peao(tabuleiro, p);
-			break;
-		case 'T':
-			torre(tabuleiro, p);
-			break;
-		case 'B':
-			bispo(tabuleiro, p);
-			break;
-		case 'C':
-			cavalo(tabuleiro, p);
-			break;
-		case 'Q':
-			rainha(tabuleiro, p);
-			break;
-		case 'K':
-			rei(tabuleiro, p);
-			break;
-		default:
-			printf("\nPosição vazia");
-			system("pause");
-			break;
-	}
-	system("cls");
-	imprimirTabuleiro(tabuleiro);
+	int aux;
+	do{ 
+		printf("\nDigite a posicao atual da peca: ");
+		scanf("%d %d", &p.ini[0], &p.ini[1]);
+		printf("\nDigite a posicao de destino: ");
+		scanf("%d %d", &p.fin[0], &p.fin[1]);
+		printf("\n\nP ini - > %d %d, P fin -> %d %d",p.ini[0], p.ini[1], p.fin[0], p.fin[1]);
+		printf("\n\n Peca -> %c",tabuleiro[p.ini[0]][p.ini[1]].tipo);
+		switch(tabuleiro[p.ini[0]][p.ini[1]].tipo)
+		{
+			case 'P':
+				peao(tabuleiro, p);
+				break;
+			case 'T':
+				torre(tabuleiro, p);
+				break;
+			case 'B':
+				bispo(tabuleiro, p);
+				break;
+			case 'C':
+				cavalo(tabuleiro, p);
+				break;
+			case 'Q':
+				rainha(tabuleiro, p);
+				break;
+			case 'K':
+				rei(tabuleiro, p);
+				break;
+			default:
+				printf("\nPosicao vazia");
+				system("pause");
+				break;
+		}
+		system("pause");
+		system("cls");
+		imprimirTabuleiro(tabuleiro);
+		printf("\n\nContinuar?");
+		scanf("%i", &aux);
+
+	}while(aux!=0);
+}
+
+void configurarLocalizacao() {
+    setlocale(LC_ALL, "pt_BR.UTF-8");
 }
