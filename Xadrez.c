@@ -86,16 +86,16 @@ bool inimigo(tab tabuleiro[8][8], pos p, int x, int y)
 	return tabuleiro[p.ini[0]][p.ini[1]].cor == tabuleiro[y][x].cor;
 }
 
-void move(tab tabuleiro[8][8], pos p, possivel *cor)
+void move(tab tabuleiro[8][8], pos p, possivel *cor)// O erro está no vetor COR
 {
-	for(int i=0; i<tamanho(cor);i++)
+	for(int i=0; i<6;i++)
 	{
+		
 		if(p.fin[1] == cor[i].x && p.fin[0] == cor[i].y)
 		{
 			tabuleiro[p.fin[0]][p.fin[1]] = tabuleiro[p.ini[0]][p.ini[1]]; // Coloca a peça da posição inicial na posição final
 			tabuleiro[p.ini[0]][p.ini[1]] = (tab) {'-','N'}; // Coloca um espaço vazio na posição inicial	
 			free(cor);
-			system("pause");
 			return;
 		}
 	}
@@ -107,14 +107,14 @@ possivel* peao(tab tabuleiro[8][8], pos p)
 {
 	possivel *coordenadas = NULL;
 	int tam;
-	if(tabuleiro[p.ini[0]][p.ini[1]].cor = 'W') // Verifica se a movimentação é de um peão branco 
+	if(tabuleiro[p.ini[0]][p.ini[1]].cor == 'B') // Verifica se a movimentação é de um peão branco 
 	{
 		if(valido(0,p.ini[0]+1) && vazio(tabuleiro, p.ini[1], p.ini[0]+1)) // Verifica se a casa a frente está vazia e se o movimento é possível e válido
 		{
 			tam = tamanho(coordenadas)+1;
 			aloca(&coordenadas, tam);
-			coordenadas[tam].x=p.ini[1];
-			coordenadas[tam].y=p.ini[0]+1;
+			(coordenadas+(tam-1))->x=p.ini[1];
+			(coordenadas+(tam-1))->y =p.ini[0]+1;
 		}
 		else if(valido(p.ini[1]-1,p.ini[0]+1) && valido(p.ini[1]+1,p.ini[0]+1)) // verifica se as casas diagonais são válidas
 		{
@@ -122,13 +122,13 @@ possivel* peao(tab tabuleiro[8][8], pos p)
 			aloca(&coordenadas, tam);
 			if(inimigo(tabuleiro, p, p.ini[1]-1, p.ini[0]+1)) // verifica se há um inimigo na diagonal esquerda
 			{
-				coordenadas[tam].x=p.ini[1]-1;
-				coordenadas[tam].y=p.ini[0]+1;
+				(coordenadas+(tam-1))->x=p.ini[1]-1;
+				(coordenadas+(tam-1))->y=p.ini[0]+1;
 			}
 			else if(inimigo(tabuleiro, p, p.ini[1]+1, p.ini[0]+1)) // verifica se há um inimigo na diagonal direita
 			{
-				coordenadas[tam].x=p.ini[1]+1;
-				coordenadas[tam].y=p.ini[0]+1;
+				(coordenadas+(tam-1))->x=p.ini[1]+1;
+				(coordenadas+(tam-1))->y=p.ini[0]+1;
 			}
 			
 		}
@@ -139,8 +139,8 @@ possivel* peao(tab tabuleiro[8][8], pos p)
 		{
 			tam = tamanho(coordenadas)+1;
 			aloca(&coordenadas, tam);
-			coordenadas[tam].x=p.ini[1];
-			coordenadas[tam].y=p.ini[0]-1;
+			(coordenadas+(tam-1))->x=p.ini[1];
+			(coordenadas+(tam-1))->y=p.ini[0]-1;
 		}
 		else if(valido(p.ini[1]-1,p.ini[0]-1) && valido(p.ini[1]+1,p.ini[0]-1)) // verifica se as casas diagonais são válidas
 		{
@@ -148,19 +148,18 @@ possivel* peao(tab tabuleiro[8][8], pos p)
 			aloca(&coordenadas, tam); 
 			if(inimigo(tabuleiro, p, p.ini[1]-1, p.ini[0]-1)) // verifica se há um inimigo na diagonal esquerda
 			{
-				coordenadas[tam].x=p.ini[1]-1;
-				coordenadas[tam].y=p.ini[0]-1;
+				(coordenadas+(tam-1))->x=p.ini[1]-1;
+				(coordenadas+(tam-1))->y=p.ini[0]-1;
 			}
 			else if(inimigo(tabuleiro, p, p.ini[1]+1, p.ini[0]-1)) // verifica se há um inimigo na diagonal direita
 			{
-				coordenadas[tam].x=p.ini[1]+1;
-				coordenadas[tam].y=p.ini[0]-1;
+				(coordenadas+(tam-1))->x=p.ini[1]+1;
+				(coordenadas+(tam-1))->y=p.ini[0]-1;
 			}
 			
 		}
 	}
-	
-
+	return coordenadas;
 }
 
 possivel* cavalo(tab tabuleiro[8][8], pos p)
@@ -175,14 +174,16 @@ possivel* cavalo(tab tabuleiro[8][8], pos p)
 		if(valido(p.ini[1]+aux[i].x, p.ini[0]+aux[i].y))
 			if(vazio(tabuleiro,p.ini[1]+aux[i].x, p.ini[0]+aux[i].y) || inimigo(tabuleiro, p, p.ini[1]+aux[i].x, p.ini[0]+aux[i].y)) // verifica todas as instancias possíveis em relação a posição inicial
 			{
-				coordenadas[i].x=p.ini[1]+aux[i].x;
-				coordenadas[i].y=p.ini[0]+aux[i].y;
+				(coordenadas+i)->x=p.ini[1]+aux[i].x;
+				(coordenadas+i)->y=p.ini[0]+aux[i].y;
 			}
 
 	}
 
+	return coordenadas;
+
 }
-possivel* torre(tab tabuleiro[8][8], pos p)
+possivel* torre(tab tabuleiro[8][8], pos p) // Torre branca está comendo o peão branco
 {
 	int esquerda = 1, direita = 1, frente = 1, tras = 1;
 	possivel *coordenadas = NULL;
@@ -194,8 +195,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 		{
 			tam = tamanho(coordenadas)+1;
 			aloca(&coordenadas, tam);
-			coordenadas[tam].x=p.ini[1];
-			coordenadas[tam].y=p.ini[0]+i;
+			(coordenadas+(tam-1))->x=p.ini[1];
+			(coordenadas+(tam-1))->y=p.ini[0]+i;
 		}
 		else if(frente == 1 && !vazio(tabuleiro, p.ini[1], p.ini[0]+i)) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 		{
@@ -204,8 +205,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1];
-				coordenadas[tam].y=p.ini[0]+i;
+				(coordenadas+(tam-1))->x=p.ini[1];
+				(coordenadas+(tam-1))->y=p.ini[0]+i;
 			}
 		}
 
@@ -213,8 +214,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 		{
 			tam = tamanho(coordenadas)+1;
 			aloca(&coordenadas, tam);
-			coordenadas[tam].x=p.ini[1];
-			coordenadas[tam].y=p.ini[0]-i;
+			(coordenadas+(tam-1))->x=p.ini[1];
+			(coordenadas+(tam-1))->y=p.ini[0]-i;
 		}
 		else if(tras == 1 && !vazio(tabuleiro, p.ini[1], p.ini[0]-i)) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 		{
@@ -223,8 +224,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1];
-				coordenadas[tam].y=p.ini[0]-i;
+				(coordenadas+(tam-1))->x=p.ini[1];
+				(coordenadas+(tam-1))->y=p.ini[0]-i;
 			}
 		}
 				
@@ -233,8 +234,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 		{
 			tam = tamanho(coordenadas)+1;
 			aloca(&coordenadas, tam);
-			coordenadas[tam].x=p.ini[1]+i;
-			coordenadas[tam].y=p.ini[0];
+			(coordenadas+(tam-1))->x=p.ini[1]+i;
+			(coordenadas+(tam-1))->y=p.ini[0];
 		}
 		else if(direita == 1 && !vazio(tabuleiro, p.ini[1]+i, p.ini[0])) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 		{
@@ -243,8 +244,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+i;
-				coordenadas[tam].y=p.ini[0];
+				(coordenadas+(tam-1))->x=p.ini[1]+i;
+				(coordenadas+(tam-1))->y=p.ini[0];
 			}
 				
 			}
@@ -254,8 +255,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]-i;
-				coordenadas[tam].y=p.ini[0];
+				(coordenadas+(tam-1))->x=p.ini[1]-i;
+				(coordenadas+(tam-1))->y=p.ini[0];
 			}
 			else if(esquerda == 1 && !vazio(tabuleiro, p.ini[1]-i, p.ini[0])) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{ 
@@ -264,8 +265,8 @@ possivel* torre(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]-i;
-					coordenadas[tam].y=p.ini[0];
+					(coordenadas+(tam-1))->x=p.ini[1]-i;
+					(coordenadas+(tam-1))->y=p.ini[0];
 				}
 			}		
 				
@@ -292,8 +293,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]-i;
-				coordenadas[tam].y=p.ini[0]-i;
+				(coordenadas+(tam-1))->x=p.ini[1]-i;
+				(coordenadas+(tam-1))->y=p.ini[0]-i;
 			}
 			else if(dEC == 1 && !vazio(tabuleiro, p.ini[1]-i, p.ini[0]-i)) // Caso tenha uma peça inimiga nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -302,8 +303,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]-i;
-					coordenadas[tam].y=p.ini[0]-i;
+					(coordenadas+(tam-1))->x=p.ini[1]-i;
+					(coordenadas+(tam-1))->y=p.ini[0]-i;
 				}
 			}
 
@@ -311,8 +312,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]-i;
-				coordenadas[tam].y=p.ini[0]+i;
+				(coordenadas+(tam-1))->x=p.ini[1]-i;
+				(coordenadas+(tam-1))->y=p.ini[0]+i;
 			}
 			else if(dEB == 1 && !vazio(tabuleiro, p.ini[1]-i,p.ini[0]+i)) // Caso tenha uma peça inimiga nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -321,8 +322,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]-i;
-					coordenadas[tam].y=p.ini[0]+i;
+					(coordenadas+(tam-1))->x=p.ini[1]-i;
+					(coordenadas+(tam-1))->y=p.ini[0]+i;
 				}
 			}
 				
@@ -331,8 +332,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+i;
-				coordenadas[tam].y=p.ini[0]-i;
+				(coordenadas+(tam-1))->x=p.ini[1]+i;
+				(coordenadas+(tam-1))->y=p.ini[0]-i;
 			}
 			else if(dDC == 1 && !vazio(tabuleiro, p.ini[1]+i, p.ini[0]-i)) // Caso tenha uma peça inimiga nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -341,8 +342,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]+i;
-					coordenadas[tam].y=p.ini[0]-i;
+					(coordenadas+(tam-1))->x=p.ini[1]+i;
+					(coordenadas+(tam-1))->y=p.ini[0]-i;
 				}
 				
 			}
@@ -352,8 +353,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+i;
-				coordenadas[tam].y=p.ini[0]+i;
+				(coordenadas+(tam-1))->x=p.ini[1]+i;
+				(coordenadas+(tam-1))->y=p.ini[0]+i;
 			}
 			else if(dDB == 1 && !vazio(tabuleiro, p.ini[1]+i, p.ini[0]+i)) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{ 
@@ -362,16 +363,16 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]+i;
-					coordenadas[tam].y=p.ini[0]+i;
+					(coordenadas+(tam-1))->x=p.ini[1]+i;
+					(coordenadas+(tam-1))->y=p.ini[0]+i;
 				}
 			}
 			if(valido(0,p.ini[0]+i) && vazio(tabuleiro, p.ini[1], p.ini[0]+i) && frente == 1) // Verifica para frente e guarda as posições possiveis no vetor coordenadas
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1];
-				coordenadas[tam].y=p.ini[0]+i;
+				(coordenadas+(tam-1))->x=p.ini[1];
+				(coordenadas+(tam-1))->y=p.ini[0]+i;
 			}
 			else if(frente == 1 && !vazio(tabuleiro, p.ini[1], p.ini[0]+i)) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -380,8 +381,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1];
-					coordenadas[tam].y=p.ini[0]+i;
+					(coordenadas+(tam-1))->x=p.ini[1];
+					(coordenadas+(tam-1))->y=p.ini[0]+i;
 				}
 			}
 
@@ -389,8 +390,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1];
-				coordenadas[tam].y=p.ini[0]-i;
+				(coordenadas+(tam-1))->x=p.ini[1];
+				(coordenadas+(tam-1))->y=p.ini[0]-i;
 			}
 			else if(tras == 1 && !vazio(tabuleiro, p.ini[1], p.ini[0]-i)) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -399,8 +400,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1];
-					coordenadas[tam].y=p.ini[0]-i;
+					(coordenadas+(tam-1))->x=p.ini[1];
+					(coordenadas+(tam-1))->y=p.ini[0]-i;
 				}
 			}
 				
@@ -409,8 +410,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+i;
-				coordenadas[tam].y=p.ini[0];
+				(coordenadas+(tam-1))->x=p.ini[1]+i;
+				(coordenadas+(tam-1))->y=p.ini[0];
 			}
 			else if(direita == 1 && !vazio(tabuleiro, p.ini[1]+i, p.ini[0])) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -419,8 +420,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]+i;
-					coordenadas[tam].y=p.ini[0];
+					(coordenadas+(tam-1))->x=p.ini[1]+i;
+					(coordenadas+(tam-1))->y=p.ini[0];
 				}
 				
 			}
@@ -430,8 +431,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]-i;
-				coordenadas[tam].y=p.ini[0];
+				(coordenadas+(tam-1))->x=p.ini[1]-i;
+				(coordenadas+(tam-1))->y=p.ini[0];
 			}
 			else if(esquerda == 1 && !vazio(tabuleiro, p.ini[1]-i, p.ini[0])) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{ 
@@ -440,8 +441,8 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]-i;
-					coordenadas[tam].y=p.ini[0];
+					(coordenadas+(tam-1))->x=p.ini[1]-i;
+					(coordenadas+(tam-1))->y=p.ini[0];
 				}
 			}	
 			if(valido(p.ini[1]+aux[i-1].x, p.ini[0]+aux[i-1].y))
@@ -449,10 +450,11 @@ possivel* rainha(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+aux[i-1].x;
-				coordenadas[tam].y=p.ini[0]+aux[i-1].y;
+				(coordenadas+(tam-1))->x=p.ini[1]+aux[i-1].x;
+				(coordenadas+(tam-1))->y=p.ini[0]+aux[i-1].y;
 			}
 	}
+	return coordenadas;
 
 }
 possivel* rei(tab tabuleiro[8][8], pos p)
@@ -466,11 +468,12 @@ possivel* rei(tab tabuleiro[8][8], pos p)
 		if(valido(p.ini[1]+aux[i].x, p.ini[0]+aux[i].y))
 			if(vazio(tabuleiro,p.ini[1]+aux[i].x, p.ini[0]+aux[i].y) || inimigo(tabuleiro, p, p.ini[1]+aux[i].x, p.ini[0]+aux[i].y))
 			{
-				coordenadas[i].x=p.ini[1]+aux[i].x;
-				coordenadas[i].y=p.ini[0]+aux[i].y;
+				(coordenadas+i)->x=p.ini[1]+aux[i].x;
+				(coordenadas+i)->y=p.ini[0]+aux[i].y;
 			}
 
 	}
+	return coordenadas;
 }
 possivel* bispo(tab tabuleiro[8][8], pos p)
 {
@@ -487,8 +490,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]-i;
-				coordenadas[tam].y=p.ini[0]-i;
+				(coordenadas+(tam-1))->x=p.ini[1]-i;
+				(coordenadas+(tam-1))->y=p.ini[0]-i;
 			}
 			else if(dEC == 1 && !vazio(tabuleiro, p.ini[1]-i, p.ini[0]-i)) // Caso tenha uma peça inimiga nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -497,8 +500,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]-i;
-					coordenadas[tam].y=p.ini[0]-i;
+					(coordenadas+(tam-1))->x=p.ini[1]-i;
+					(coordenadas+(tam-1))->y=p.ini[0]-i;
 				}
 			}
 
@@ -506,8 +509,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]-i;
-				coordenadas[tam].y=p.ini[0]+i;
+				(coordenadas+(tam-1))->x=p.ini[1]-i;
+				(coordenadas+(tam-1))->y=p.ini[0]+i;
 			}
 			else if(dEB == 1 && !vazio(tabuleiro, p.ini[1]-i,p.ini[0]+i)) // Caso tenha uma peça inimiga nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -516,8 +519,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]-i;
-					coordenadas[tam].y=p.ini[0]+i;
+					(coordenadas+(tam-1))->x=p.ini[1]-i;
+					(coordenadas+(tam-1))->y=p.ini[0]+i;
 				}
 			}
 				
@@ -526,8 +529,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+i;
-				coordenadas[tam].y=p.ini[0]-i;
+				(coordenadas+(tam-1))->x=p.ini[1]+i;
+				(coordenadas+(tam-1))->y=p.ini[0]-i;
 			}
 			else if(dDC == 1 && !vazio(tabuleiro, p.ini[1]+i, p.ini[0]-i)) // Caso tenha uma peça inimiga nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{
@@ -536,8 +539,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]+i;
-					coordenadas[tam].y=p.ini[0]-i;
+					(coordenadas+(tam-1))->x=p.ini[1]+i;
+					(coordenadas+(tam-1))->y=p.ini[0]-i;
 				}
 				
 			}
@@ -547,8 +550,8 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 			{
 				tam = tamanho(coordenadas)+1;
 				aloca(&coordenadas, tam);
-				coordenadas[tam].x=p.ini[1]+i;
-				coordenadas[tam].y=p.ini[0]+i;
+				(coordenadas+(tam-1))->x=p.ini[1]+i;
+				(coordenadas+(tam-1))->y=p.ini[0]+i;
 			}
 			else if(dDB == 1 && !vazio(tabuleiro, p.ini[1]+i, p.ini[0]+i)) // Caso tenha uma peça nessa posição, guarda a posição nos movimentos possíveis e para a verificação para esta direção
 			{ 
@@ -557,12 +560,12 @@ possivel* bispo(tab tabuleiro[8][8], pos p)
 				{
 					tam = tamanho(coordenadas)+1;
 					aloca(&coordenadas, tam);
-					coordenadas[tam].x=p.ini[1]+i;
-					coordenadas[tam].y=p.ini[0]+i;
+					(coordenadas+(tam-1))->x=p.ini[1]+i;
+					(coordenadas+(tam-1))->y=p.ini[0]+i;
 				}
 			}	
 	}	
-		
+	return coordenadas;
 }
 
 void imprimirTabuleiro(tab tabuleiro[8][8])
@@ -590,11 +593,11 @@ void jogada(tab tabuleiro[8][8])
 		printf("\nDigite a posicao de destino: ");
 		scanf("%d %d", &p.fin[0], &p.fin[1]);
 		printf("\n\nP ini - > %d %d, P fin - > %d %d",p.ini[0], p.ini[1], p.fin[0], p.fin[1]);
-		printf("\n\n Peca - > %c",tabuleiro[p.ini[0]][p.ini[1]].tipo);
+		printf("\n\n Peca - > %c, cor - > %c",tabuleiro[p.ini[0]][p.ini[1]].tipo, tabuleiro[p.ini[0]][p.ini[1]].cor);
 		switch(tabuleiro[p.ini[0]][p.ini[1]].tipo)
 		{
 			case 'P':
-				cor = peao(tabuleiro, p);
+				cor = peao(tabuleiro, p); // O valor não está sendo passado corretamente para o ponteiro cor
 				move(tabuleiro, p, cor);
 				break;
 			case 'T':
