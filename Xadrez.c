@@ -83,7 +83,7 @@ bool vazio(tab tabuleiro[8][8],int x,int y)
 
 bool inimigo(tab tabuleiro[8][8], pos p, int x, int y)
 {
-	return tabuleiro[p.ini[0]][p.ini[1]].cor == tabuleiro[y][x].cor;
+	return tabuleiro[p.ini[0]][p.ini[1]].cor != tabuleiro[y][x].cor;
 }
 
 void move(tab tabuleiro[8][8], pos p, possivel *cor)// O erro está no vetor COR
